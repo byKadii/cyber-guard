@@ -1032,6 +1032,38 @@ function saveDarkModePreference(preference) {
 }
 
 /**
+ * Runtime cleanup: remove any leftover auth links or buttons that
+ * might remain from cached pages or older builds.
+ */
+function removeLeftoverAuthElements() {
+  // Remove anchors that point to login/signup pages
+  document.querySelectorAll('a[href*="login"], a[href*="signup"], a[href*="Login"], a[href*="Signup"]').forEach(el => el.remove());
+
+  // Remove buttons or elements containing 'Log in' or 'Sign up' text
+  document.querySelectorAll('button, a, span, div').forEach(el => {
+    try {
+      const txt = (el.textContent || '').trim();
+      if (/^\s*(Log in|Login|Sign up|Sign Up|SignIn|Sign in)\s*$/i.test(txt)) {
+        el.remove();
+      }
+    } catch (e) {
+      // ignore
+    }
+  });
+
+  // If there's an element with id 'loginBtn' remove it
+  const loginBtn = document.getElementById('loginBtn');
+  if (loginBtn) loginBtn.remove();
+}
+
+// Run cleanup as soon as DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', removeLeftoverAuthElements);
+} else {
+  removeLeftoverAuthElements();
+}
+
+/**
  * Initializes dark mode based on saved preference
  * DISABLED: Always uses bright purple theme, never dark mode
  */
