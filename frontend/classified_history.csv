@@ -1,0 +1,12 @@
+2025-11-11T00:12:45,http://phishingsite.com,malicious
+2025-11-11T00:13:10,http://fakebank.net,phishing
+2025-11-11T00:14:22,http://update-secure-login.com,unsafe
+2025-11-11T00:28:39.924540,http://testphp.vulnweb.com/login.php,phishing
+2025-11-11T00:29:54.760485,http://testphp.vulnweb.com/login.php,phishing
+2025-11-11T01:01:26.223043,http://testphp.vulnweb.com/login.php,phishing
+2025-11-11T01:17:51.988333,http://testphp.vulnweb.com/login.php,phishing
+2025-11-11T09:24:10.880960,http://testphp.vulnweb.com/login.php,phishing
+2025-11-11T09:45:04.371573,http://testphp.vulnweb.com/login.php,phishing
+2025-11-11T09:55:09.894873,http://testphp.vulnweb.com/login.php,phishing
+2025-11-11T09:55:28.959945,http://testphp.vulnweb.com/login.php,phishing
+

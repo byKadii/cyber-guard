@@ -6,7 +6,7 @@ url_to_test = "https://www.google.com"
 # 🚀 إرسال الطلب إلى السيرفر
 try:
     response = requests.post(
-        "http://127.0.0.1:5000/predict",
+        "http://localhost:8000/predict",
         json={"url": url_to_test}
     )
 

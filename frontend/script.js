@@ -143,7 +143,7 @@ function performUrlAnalysis(url) {
  * @param {number} analysisStartTime - Start time of analysis
  */
 function callBackendAPI(url, analysisStartTime) {
-  const backendURL = 'http://localhost:5000/predict';
+  const backendURL = 'http://localhost:8000/predict_public';
   
   fetch(backendURL, {
     method: 'POST',
@@ -591,21 +591,40 @@ function shareWithClipboard(shareText) {
 }
 
 /**
- * Form Handling Module
- * Handles user authentication forms (login/signup)
+ * Form Handling (auth removed)
+ * Authentication was removed project-wide. Keep lightweight handlers
+ * and adapt history API calls to be public (no tokens).
  */
 
-// Form configuration constants
+// Form configuration constants (minimal)
 const FORM_CONFIG = {
   redirectDelay: 1500,
-  homePage: 'index.html',
-  loginPage: 'login.html'
+  homePage: 'index.html'
 };
 
 /**
- * Form Validation Module
- * Provides real-time validation feedback
+ * Lightweight public API fetch helper
+ * Uses relative endpoints so the site can work against different hosts.
  */
+async function apiFetch(endpoint, options = {}) {
+  const url = endpoint.startsWith('http') ? endpoint : `${window.location.origin}${endpoint}`;
+  return fetch(url, options);
+}
+
+/**
+ * Authentication handlers removed — show info and redirect to home
+ */
+function handleLogin(event) {
+  if (event) event.preventDefault();
+  showNotification('Accounts removed — redirecting to home', 'info');
+  setTimeout(() => { window.location.href = FORM_CONFIG.homePage; }, FORM_CONFIG.redirectDelay);
+}
+
+function handleSignup(event) {
+  if (event) event.preventDefault();
+  showNotification('Accounts removed — redirecting to home', 'info');
+  setTimeout(() => { window.location.href = FORM_CONFIG.homePage; }, FORM_CONFIG.redirectDelay);
+}
 
 // Validation patterns
 const VALIDATION_PATTERNS = {
@@ -803,10 +822,7 @@ function handleLogin(event) {
  * Handles signup form submission
  * @param {Event} event - Form submission event
  */
-function handleSignup(event) {
-  event.preventDefault();
-  handleSignup(event);
-}
+// (signup handler defined above)
 
 /**
  * Extracts form data from form element
@@ -841,327 +857,45 @@ function isValidSignupData(formData) {
   return Boolean(formData.username && formData.email && formData.password);
 }
 
-/**
- * Authentication configuration constants
- */
-const AUTH_CONFIG = {
-  storageKey: 'userAuth',
-  tokenKey: 'authToken',
-  apiBaseUrl: 'http://localhost:5000/api',
-  redirectDelay: 1500,
-  homePage: 'index.html',
-  loginPage: 'login.html'
-};
-
-/**
- * Saves JWT token and user data to localStorage
- * @param {string} token - JWT token
- * @param {Object} userData - User data object
- */
-function saveUserAuth(token, userData) {
-  try {
-    localStorage.setItem(AUTH_CONFIG.tokenKey, token);
-    localStorage.setItem(AUTH_CONFIG.storageKey, JSON.stringify(userData));
-    
-    // Also save JWT token to Chrome extension storage so extension can use it
-    if (typeof chrome !== 'undefined' && chrome.storage) {
-      chrome.storage.local.set({ jwtToken: token }, () => {
-        console.log('JWT token saved to extension storage');
-      });
-    }
-  } catch (e) {
-    console.error('Failed to save auth data:', e);
-  }
-}
-
-/**
- * Gets stored JWT token from localStorage
- * @returns {string|null} JWT token or null
- */
-function getStoredToken() {
-  try {
-    return localStorage.getItem(AUTH_CONFIG.tokenKey);
-  } catch (e) {
-    console.error('Failed to get token:', e);
-    return null;
-  }
-}
-
-/**
- * Gets stored user data from localStorage
- * @returns {Object|null} User data or null
- */
-function getStoredUserAuth() {
-  try {
-    const storedAuth = localStorage.getItem(AUTH_CONFIG.storageKey);
-    return storedAuth ? JSON.parse(storedAuth) : null;
-  } catch (e) {
-    console.error('Failed to get user auth:', e);
-    return null;
-  }
-}
-
-/**
- * Clears all authentication data from localStorage
- */
-function clearUserAuth() {
-  try {
-    localStorage.removeItem(AUTH_CONFIG.tokenKey);
-    localStorage.removeItem(AUTH_CONFIG.storageKey);
-    
-    // Also clear JWT token from extension storage
-    if (typeof chrome !== 'undefined' && chrome.storage) {
-      chrome.storage.local.remove('jwtToken', () => {
-        console.log('JWT token cleared from extension storage');
-      });
-    }
-  } catch (e) {
-    console.error('Failed to clear auth data:', e);
-  }
-}
-
-/**
- * Makes authenticated API call with JWT token
- * @param {string} endpoint - API endpoint
- * @param {Object} options - Fetch options
- * @returns {Promise} API response
- */
-async function authenticatedFetch(endpoint, options = {}) {
-  const token = getStoredToken();
-  
-  if (!token) {
-    throw new Error('No authentication token found');
-  }
-  
-  const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-    ...options.headers
-  };
-  
-  const response = await fetch(`${AUTH_CONFIG.apiBaseUrl}${endpoint}`, {
-    ...options,
-    headers
-  });
-  
-  // If token is invalid/expired, logout user
-  if (response.status === 401) {
-    clearUserAuth();
-    updateUIForLoggedOut();
-    window.location.href = AUTH_CONFIG.loginPage;
-    return null;
-  }
-  
-  return response;
-}
-
-/**
- * Register new user with secure backend
- */
-async function handleSignup(event) {
-  event.preventDefault();
-  
-  const form = event.target;
-  const usernameInput = form.querySelector('input[type="text"]');
-  const emailInput = form.querySelector('input[type="email"]');
-  const passwordInput = form.querySelector('input[type="password"]');
-  
-  const username = usernameInput ? usernameInput.value.trim() : '';
-  const email = emailInput ? emailInput.value.trim() : '';
-  const password = passwordInput ? passwordInput.value : '';
-  
-  if (!username || !email || !password) {
-    showNotification('Please fill all fields', 'error');
-    return;
-  }
-  
-  if (username.length < 3) {
-    showNotification('Username must be at least 3 characters', 'error');
-    return;
-  }
-  
-  if (password.length < 8) {
-    showNotification('Password must be at least 8 characters', 'error');
-    return;
-  }
-  
-  try {
-    const response = await fetch(`${AUTH_CONFIG.apiBaseUrl}/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, email, password })
-    });
-    
-    const data = await response.json();
-    
-    if (!response.ok) {
-      showNotification(data.error || 'Registration failed', 'error');
-      return;
-    }
-    
-    saveUserAuth(data.token, data.user);
-    updateUIForLoggedIn(data.user);
-    showNotification('Account created successfully!', 'success');
-    
-    setTimeout(() => {
-      window.location.href = AUTH_CONFIG.homePage;
-    }, AUTH_CONFIG.redirectDelay);
-    
-  } catch (error) {
-    console.error('Signup error:', error);
-    showNotification('An error occurred during signup', 'error');
-  }
-}
-
-/**
- * Login user with secure backend
- */
-async function handleLoginSubmit(event) {
-  event.preventDefault();
-  
-  const form = event.target;
-  const usernameInput = form.querySelector('input[type="text"]');
-  const passwordInput = form.querySelector('input[type="password"]');
-  
-  const username = usernameInput ? usernameInput.value.trim() : '';
-  const password = passwordInput ? passwordInput.value : '';
-  
-  if (!username || !password) {
-    showNotification('Please enter username and password', 'error');
-    return;
-  }
-  
-  try {
-    const response = await fetch(`${AUTH_CONFIG.apiBaseUrl}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
-    
-    const data = await response.json();
-    
-    if (!response.ok) {
-      showNotification(data.error || 'Login failed', 'error');
-      return;
-    }
-    
-    saveUserAuth(data.token, data.user);
-    updateUIForLoggedIn(data.user);
-    showNotification('Login successful!', 'success');
-    
-    setTimeout(() => {
-      window.location.href = AUTH_CONFIG.homePage;
-    }, AUTH_CONFIG.redirectDelay);
-    
-  } catch (error) {
-    console.error('Login error:', error);
-    showNotification('An error occurred during login', 'error');
-  }
-}
-
-/**
- * Logout user
- */
-async function handleLogout(event) {
-  if (event) {
-    event.preventDefault();
-  }
-  
-  try {
-    await authenticatedFetch('/auth/logout', { method: 'POST' });
-  } catch (error) {
-    console.error('Logout error:', error);
-  }
-  
-  clearUserAuth();
-  updateUIForLoggedOut();
-  showNotification('Logged out successfully', 'success');
-  
-  setTimeout(() => {
-    window.location.href = AUTH_CONFIG.loginPage;
-  }, AUTH_CONFIG.redirectDelay);
-}
-
-/**
- * Updates UI to show logged-in state
- */
+// Authentication helper functions removed; session restoration is a no-op
 function updateUIForLoggedIn(userData) {
   const loginBtn = document.getElementById('loginBtn');
-  
   if (loginBtn) {
-    loginBtn.textContent = userData.username;
+    loginBtn.textContent = 'Account';
     loginBtn.href = '#';
-    loginBtn.onclick = handleLogout;
-    loginBtn.classList.add('btn--logout');
-    loginBtn.title = 'Click to logout';
+    loginBtn.onclick = () => showNotification('Accounts removed', 'info');
   }
 }
 
-/**
- * Updates UI to show logged-out state
- */
 function updateUIForLoggedOut() {
   const loginBtn = document.getElementById('loginBtn');
-  
   if (loginBtn) {
     loginBtn.textContent = 'Log in';
-    loginBtn.href = 'login.html';
-    loginBtn.onclick = null;
-    loginBtn.classList.remove('btn--logout');
-    loginBtn.title = 'Log in';
+    loginBtn.href = '#';
+    loginBtn.onclick = () => showNotification('Login removed', 'info');
   }
 }
 
-/**
- * Restores user session from stored token
- */
 async function restoreUserSession() {
-  const token = getStoredToken();
-  const userData = getStoredUserAuth();
-  
-  if (!token || !userData) {
-    return;
-  }
-  
-  try {
-    const response = await authenticatedFetch('/auth/verify');
-    
-    if (response && response.ok) {
-      const data = await response.json();
-      updateUIForLoggedIn(data.user);
-    } else {
-      clearUserAuth();
-    }
-  } catch (error) {
-    console.error('Session restore error:', error);
-    clearUserAuth();
-  }
+  // No server-side authentication present; ensure UI shows logged out state
+  updateUIForLoggedOut();
 }
 
 /**
  * Fetch user's scan history from secure backend
  */
 async function fetchUserHistory() {
-  const token = getStoredToken();
-  
-  if (!token) {
-    console.warn('User not authenticated');
-    return [];
-  }
-  
   try {
-    const response = await authenticatedFetch('/history');
-    
-    if (!response) return [];
-    
+    const response = await apiFetch('/api/history', { method: 'GET' });
+
     if (!response.ok) {
       console.error('Failed to fetch history');
       return [];
     }
-    
+
     const data = await response.json();
     return data.history || [];
-    
+
   } catch (error) {
     console.error('Failed to fetch history:', error);
     return [];
@@ -1169,24 +903,49 @@ async function fetchUserHistory() {
 }
 
 /**
+ * Initialize and render the history page table
+ */
+async function initHistoryPage() {
+  const tbody = document.querySelector('#HistoryTable tbody');
+  if (!tbody) return;
+
+  tbody.innerHTML = `\n    <tr>\n      <td colspan="3" class="history-loading">\n        <div>Loading history...</div>\n      </td>\n    </tr>\n  `;
+
+  const history = await fetchUserHistory();
+
+  if (!history || history.length === 0) {
+    tbody.innerHTML = `\n      <tr>\n        <td colspan="3">\n          <div class="empty-state">\n            <div class="empty-state-icon">📋</div>\n            <div class="empty-state-title">No History Yet</div>\n            <div class="empty-state-message">Your URL analysis history will appear here once you start scanning links or when the extension blocks malicious URLs.</div>\n          </div>\n        </td>\n      </tr>\n    `;
+    return;
+  }
+
+  // Render rows
+  tbody.innerHTML = history.map(item => {
+    const time = item.timestamp || '';
+    const url = escapeHtml(item.url || '');
+    const status = escapeHtml(item.status || '');
+    return `\n      <tr>\n        <td>${time}</td>\n        <td><a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a></td>\n        <td>${status}</td>\n      </tr>\n    `;
+  }).join('');
+}
+
+// Simple HTML escaper
+function escapeHtml(unsafe) {
+  return unsafe
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+/**
  * Add URL scan to user history on backend
  */
 async function addToUserHistory(url, status, threatLevel) {
-  const token = getStoredToken();
-  
-  if (!token) {
-    console.warn('User not authenticated, history not saved');
-    return;
-  }
-  
   try {
-    await authenticatedFetch('/history', {
+    await apiFetch('/api/history', {
       method: 'POST',
-      body: JSON.stringify({
-        url,
-        status,
-        threat_level: threatLevel
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, status, threat_level: threatLevel })
     });
   } catch (error) {
     console.error('Failed to add to history:', error);
@@ -1198,10 +957,7 @@ async function addToUserHistory(url, status, threatLevel) {
  */
 async function deleteHistoryItem(historyId) {
   try {
-    const response = await authenticatedFetch(`/history/${historyId}`, {
-      method: 'DELETE'
-    });
-    
+    const response = await apiFetch(`/api/history/${historyId}`, { method: 'DELETE' });
     if (response && response.ok) {
       showNotification('History item deleted', 'success');
       return true;
@@ -1209,7 +965,6 @@ async function deleteHistoryItem(historyId) {
   } catch (error) {
     console.error('Failed to delete history:', error);
   }
-  
   return false;
 }
 
