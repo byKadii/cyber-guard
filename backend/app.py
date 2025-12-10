@@ -370,11 +370,14 @@ def delete_history_item(history_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# 🔮 URL Prediction Endpoint (with user history)
+# 🔮 URL Prediction Endpoint (works with or without login)
 @app.route('/predict', methods=['POST'])
-@token_required
 def predict():
-    """Predict URL safety and save to user history"""
+    """
+    Predict URL safety (works for everyone)
+    If user is logged in: saves scan to their history
+    If user is not logged in: just returns prediction (no history saved)
+    """
     data = request.get_json()
     url = data.get('url')
     
@@ -396,15 +399,34 @@ def predict():
             if any(tag in url.lower() for tag in ["vulnweb", "acunetix", "testphp", "demo"]):
                 prediction_label = "phishing"
         
-        # Save to user history in database
-        conn = get_db()
-        cursor = conn.cursor()
-        
         threat_level = 'high' if prediction_label.lower() in ['phishing', 'malicious'] else 'low'
-        cursor.execute('INSERT INTO scan_history (user_id, url, status, threat_level) VALUES (?, ?, ?, ?)',
-                      (request.user_id, url, prediction_label, threat_level))
-        conn.commit()
-        conn.close()
+        
+        # Check if user is logged in (has valid JWT token)
+        # If they are, save to their history
+        user_id = None
+        auth_header = request.headers.get('Authorization')
+        if auth_header and auth_header.startswith('Bearer '):
+            try:
+                token = auth_header.split(' ')[1]
+                payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+                user_id = payload.get('user_id')
+            except jwt.ExpiredSignatureError:
+                pass  # Token expired, but that's OK - still return prediction
+            except jwt.InvalidTokenError:
+                pass  # Invalid token, but that's OK - still return prediction
+        
+        # If user is logged in, save to their history
+        if user_id:
+            try:
+                conn = get_db()
+                cursor = conn.cursor()
+                cursor.execute('INSERT INTO scan_history (user_id, url, status, threat_level) VALUES (?, ?, ?, ?)',
+                              (user_id, url, prediction_label, threat_level))
+                conn.commit()
+                conn.close()
+            except Exception as history_error:
+                print(f"Warning: Failed to save to history: {history_error}")
+                # Don't fail the prediction just because history save failed
         
         return jsonify({
             'prediction': prediction_label,

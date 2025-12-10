@@ -1,6 +1,7 @@
 const API_BASE_URL = "http://localhost:5000";
 
 // Listen for tab updates and check URLs if auto-check is enabled
+// Works with or without user being logged in
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (
     changeInfo.status === "complete" &&
@@ -8,18 +9,25 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     !tab.url.startsWith("chrome://") &&
     !tab.url.startsWith("chrome-extension://")
   ) {
-    // Check if auto-check is enabled and user is authenticated
+    // Check if auto-check is enabled (JWT token is optional)
     chrome.storage.local.get(["autoCheck", "jwtToken"], (data) => {
-      // Only proceed if autoCheck is enabled AND user has JWT token
-      if (data.autoCheck === true && data.jwtToken) {
-        fetch(`${API_BASE_URL}/predict`, {
+      // Proceed if autoCheck is enabled (JWT optional for history, but not needed for blocking)
+      if (data.autoCheck === true) {
+        // Build request with optional JWT
+        const fetchOptions = {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${data.jwtToken}`
+            "Content-Type": "application/json"
           },
           body: JSON.stringify({ url: tab.url })
-        })
+        };
+
+        // Add JWT to header if available (will be saved to history if logged in)
+        if (data.jwtToken) {
+          fetchOptions.headers["Authorization"] = `Bearer ${data.jwtToken}`;
+        }
+
+        fetch(`${API_BASE_URL}/predict`, fetchOptions)
         .then(response => response.json())
         .then(result => {
           const prediction = (result.prediction || "").toLowerCase();
@@ -39,7 +47,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
             priority: isAlarmingViaURL ? 2 : 0
           });
 
-          // If malicious: show warning page and optionally close tab
+          // If malicious: show warning page and close tab
           if (isAlarmingViaURL) {
             chrome.windows.create({
               url: chrome.runtime.getURL("warning.html") + 

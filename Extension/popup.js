@@ -1,15 +1,6 @@
 const API_BASE_URL = "http://localhost:5000";
 
-// Check if user has valid JWT token
-async function checkAuthToken() {
-  return new Promise((resolve) => {
-    chrome.storage.local.get("jwtToken", (data) => {
-      resolve(data.jwtToken ? true : false);
-    });
-  });
-}
-
-// Get current URL and check it
+// Get current URL and check it (works with or without login)
 async function checkCurrentURL() {
   const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
   const currentURL = tabs[0]?.url;
@@ -19,29 +10,31 @@ async function checkCurrentURL() {
     return;
   }
 
-  const isAuthenticated = await checkAuthToken();
-  if (!isAuthenticated) {
-    document.getElementById("status").textContent = "⚠️ Please login first at http://localhost:5000";
-    return;
-  }
-
   document.getElementById("status").textContent = "🔍 Checking URL...";
 
   try {
+    // Get JWT token if available (optional)
     const jwtToken = await new Promise((resolve) => {
       chrome.storage.local.get("jwtToken", (data) => {
-        resolve(data.jwtToken);
+        resolve(data.jwtToken || null);
       });
     });
 
-    const response = await fetch(`${API_BASE_URL}/predict`, {
+    // Build request with optional JWT
+    const fetchOptions = {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${jwtToken}`
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({ url: currentURL })
-    });
+    };
+
+    // Add JWT to header if available (will be saved to history if logged in)
+    if (jwtToken) {
+      fetchOptions.headers["Authorization"] = `Bearer ${jwtToken}`;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/predict`, fetchOptions);
 
     const data = await response.json();
     
@@ -54,6 +47,16 @@ async function checkCurrentURL() {
     } else {
       document.getElementById("status").textContent = "✅ Site looks safe";
       document.getElementById("status").style.color = "#388e3c";
+    }
+
+    // Show note if not logged in
+    if (!jwtToken) {
+      const loginNote = document.createElement("p");
+      loginNote.textContent = "(Not saving to history - login to save scans)";
+      loginNote.style.fontSize = "12px";
+      loginNote.style.color = "#999";
+      loginNote.style.marginTop = "8px";
+      document.body.appendChild(loginNote);
     }
   } catch (error) {
     document.getElementById("status").textContent = "❌ Backend not available";
@@ -81,12 +84,17 @@ chrome.storage.local.get(["autoCheck", "jwtToken"], (data) => {
   const autoCheckEnabled = data.autoCheck;
   const hasToken = data.jwtToken ? true : false;
 
-  if (!hasToken) {
-    document.getElementById("status").textContent = "⚠️ Login required at http://localhost:5000";
-  } else if (autoCheckEnabled) {
+  if (autoCheckEnabled) {
     document.getElementById("status").textContent = "Auto check enabled ✅";
     checkCurrentURL();
   } else {
     document.getElementById("status").textContent = "Auto check disabled ❌";
+    if (!hasToken) {
+      const note = document.createElement("p");
+      note.textContent = "(Login to save scans to history)";
+      note.style.fontSize = "12px";
+      note.style.color = "#999";
+      document.body.appendChild(note);
+    }
   }
 });
