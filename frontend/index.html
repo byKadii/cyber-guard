@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="Cyber Guard - Advanced URL threat detection and malicious website protection. Scan any link instantly to detect threats before you click." />
+  <meta name="keywords" content="URL security, threat detection, malicious websites, cybersecurity, link scanner" />
+  <meta name="author" content="Cyber Guard Team" />
+  <title>Cyber Guard | Advanced URL Threat Detection</title>
+  <link rel="stylesheet" href="style.css?v=21" />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <style>
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--color-primary);
+      color: #ffffff;
+      padding: var(--spacing-md) var(--spacing-lg);
+      text-decoration: none;
+      z-index: 1000;
+      border-radius: 0 0 var(--radius-md) 0;
+      font-weight: 600;
+      transition: top 0.3s;
+    }
+    .skip-link:focus {
+      top: 0;
+    }
+    
+    html, body {
+      zoom: 1 !important;
+      transform: scale(1) !important;
+      -webkit-transform: scale(1) !important;
+      font-size: 16px !important;
+      -webkit-text-size-adjust: 100% !important;
+      text-size-adjust: 100% !important;
+    }
+    .hero, .hero *, main.hero, main.hero * {
+      zoom: 1 !important;
+      transform: scale(1) !important;
+      -webkit-transform: scale(1) !important;
+    }
+    
+    @supports (-webkit-appearance: none) {
+      html, body {
+        zoom: 1 !important;
+        transform: scale(1) !important;
+        -webkit-transform: scale(1) !important;
+        will-change: auto !important;
+      }
+      .hero, .hero *, main.hero, main.hero * {
+        zoom: 1 !important;
+        transform: scale(1) !important;
+        -webkit-transform: scale(1) !important;
+        will-change: auto !important;
+      }
+    }
+  </style>
+  <script>
+    (function() {
+      'use strict';
+      
+      var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor) ||
+                     /Chrome/.test(navigator.userAgent) && /Google/.test(navigator.vendor) ||
+                     window.chrome !== undefined;
+      
+      if (isChrome) {
+        if (document.documentElement) {
+          document.documentElement.style.setProperty('zoom', '1', 'important');
+          document.documentElement.style.setProperty('transform', 'scale(1)', 'important');
+          document.documentElement.style.setProperty('-webkit-transform', 'scale(1)', 'important');
+          document.documentElement.style.setProperty('font-size', '16px', 'important');
+        }
+        if (document.body) {
+          document.body.style.setProperty('zoom', '1', 'important');
+          document.body.style.setProperty('transform', 'scale(1)', 'important');
+          document.body.style.setProperty('-webkit-transform', 'scale(1)', 'important');
+          document.body.style.setProperty('font-size', '16px', 'important');
+        }
+        
+        var viewport = document.querySelector('meta[name="viewport"]');
+        if (viewport) {
+          viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+        }
+      }
+    })();
+  </script>
+</head>
+<body>
+  <!-- Main Navigation -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <a href="index.html" class="logo" aria-label="Cyber Guard Home">
+      <div class="logo-icon" aria-hidden="true">
+        <img src="icon.png" alt="Cyber Guard Logo" loading="lazy" style="width: 100%; height: 100%; object-fit: contain;">
+      </div>
+      <span>Cyber Guard</span>
+    </a>
+    
+    <button class="mobile-menu-toggle" aria-label="Toggle mobile menu" onclick="toggleMobileMenu()" type="button">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    
+    <ul class="nav-menu" role="menubar" id="navMenu">
+      <li class="nav-menu__item" role="none">
+        <a href="index.html" class="nav-menu__link nav-menu__link--active" role="menuitem" aria-current="page">Home</a>
+      </li>
+      <li class="nav-menu__item" role="none">
+        <a href="history.html" class="nav-menu__link" role="menuitem">History</a>
+      </li>
+      <li class="nav-menu__item" role="none">
+        <a href="download.html" class="nav-menu__link" role="menuitem">Download</a>
+      </li>
+      <li class="nav-menu__item" role="none">
+        <a href="about.html" class="nav-menu__link" role="menuitem">About Us</a>
+      </li>
+    </ul>
+    
+    <div class="nav-actions">
+      <button 
+        class="btn--dark-mode dark-mode-toggle" 
+        onclick="toggleDarkMode()" 
+        aria-label="Toggle dark mode" 
+        title="Toggle Dark Mode"
+        type="button"
+      >
+        <svg class="moon-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="sun-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="5" fill="none" stroke="currentColor"/>
+          <line x1="12" y1="1" x2="12" y2="3" stroke="currentColor"/>
+          <line x1="12" y1="21" x2="12" y2="23" stroke="currentColor"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor"/>
+          <line x1="1" y1="12" x2="3" y2="12" stroke="currentColor"/>
+          <line x1="21" y1="12" x2="23" y2="12" stroke="currentColor"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor"/>
+        </svg>
+      </button>
+      <button 
+        class="btn--login login-btn" 
+        id="loginBtn"
+        onclick="window.location.href='login.html'"
+        type="button"
+      >
+        Log in
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main id="main-content" class="hero" role="main">
+    <header class="hero-header">
+      <h1>Machine Learning Based Detection of Malicious URLs</h1>
+      <p class="hero-description">Scan any link instantly to detect threats before you click</p>
+    </header>
+    
+    <div class="btn-group" role="group" aria-label="Primary actions">
+      <button 
+        class="btn--primary primary-btn" 
+        onclick="window.location.href='history.html'"
+        type="button"
+      >
+        View History
+      </button>
+      <button 
+        class="btn--secondary secondary-btn" 
+        onclick="window.location.href='download.html'"
+        type="button"
+      >
+        Download Extension
+      </button>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer role="contentinfo">
+    <p>&copy; 2025 Cyber Guard. All rights reserved.</p>
+  </footer>
+
+  <button class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" aria-label="Back to top" title="Back to top">
+    ↑
+  </button>
+  
+  <script src="script.js"></script>
+  <script>
+    window.addEventListener('scroll', function() {
+      const backToTop = document.querySelector('.back-to-top');
+      if (backToTop && window.pageYOffset > 300) {
+        backToTop.classList.add('visible');
+      } else if (backToTop) {
+        backToTop.classList.remove('visible');
+      }
+    });
+  </script>
+</body>
+</html>

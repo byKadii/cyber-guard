@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Learn about Cyber Guard - our mission, values, and commitment to protecting users from malicious websites and online threats." />
+  <meta name="keywords" content="about Cyber Guard, cybersecurity company, URL threat detection, online safety" />
+  <meta name="author" content="Cyber Guard Team" />
+  <title>Cyber Guard | About Us</title>
+  <link rel="stylesheet" href="style.css?v=21" />
+  <link rel="icon" type="image/png" href="icon.png" />
+</head>
+<body>
+  <!-- Main Navigation -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <a href="index.html" class="logo" aria-label="Cyber Guard Home">
+      <div class="logo-icon" aria-hidden="true">
+        <img src="icon.png" alt="Cyber Guard Logo" loading="lazy" style="width: 100%; height: 100%; object-fit: contain;">
+      </div>
+      <span>Cyber Guard</span>
+    </a>
+    
+    <button class="mobile-menu-toggle" aria-label="Toggle mobile menu" onclick="toggleMobileMenu()" type="button">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    
+    <ul class="nav-menu" role="menubar" id="navMenu">
+      <li class="nav-menu__item" role="none">
+        <a href="index.html" class="nav-menu__link" role="menuitem">Home</a>
+      </li>
+      <li class="nav-menu__item" role="none">
+        <a href="history.html" class="nav-menu__link" role="menuitem">History</a>
+      </li>
+      <li class="nav-menu__item" role="none">
+        <a href="download.html" class="nav-menu__link" role="menuitem">Download</a>
+      </li>
+      <li class="nav-menu__item" role="none">
+        <a href="about.html" class="nav-menu__link nav-menu__link--active" role="menuitem" aria-current="page">About Us</a>
+      </li>
+    </ul>
+    
+    <div class="nav-actions">
+      <button 
+        class="btn--dark-mode dark-mode-toggle" 
+        onclick="toggleDarkMode()" 
+        aria-label="Toggle dark mode" 
+        title="Toggle Dark Mode"
+        type="button"
+      >
+        <svg class="moon-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="sun-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="5" fill="none" stroke="currentColor"/>
+          <line x1="12" y1="1" x2="12" y2="3" stroke="currentColor"/>
+          <line x1="12" y1="21" x2="12" y2="23" stroke="currentColor"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor"/>
+          <line x1="1" y1="12" x2="3" y2="12" stroke="currentColor"/>
+          <line x1="21" y1="12" x2="23" y2="12" stroke="currentColor"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor"/>
+        </svg>
+      </button>
+      <button 
+        class="btn--login login-btn" 
+        id="loginBtn"
+        onclick="window.location.href='login.html'"
+        type="button"
+      >
+        Log in
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="about-page" role="main">
+    <!-- Hero Section -->
+    <section class="about-hero" style="margin-bottom: var(--spacing-3xl);">
+      <div class="hero-wrapper">
+        <h1>Protecting You, One Link at a Time</h1>
+      </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section class="mission-section-new" style="margin-bottom: var(--spacing-lg);">
+      <div class="container">
+        <div class="mission-items">
+          <div class="mission-item">
+            <div class="mission-item-content">
+              <div class="mission-icon-large"><span>🎯</span></div>
+              <div class="mission-text">
+                <h2>Our Mission</h2>
+                <p>We want safe browsing to be effortless. Cyber Guard gives you instant, reliable insight about any link before you click, so you can focus on what matters and stay protected.</p>
+              </div>
+            </div>
+          </div>
+          <div class="mission-item">
+            <div class="mission-item-content">
+              <div class="mission-icon-large"><span>👥</span></div>
+              <div class="mission-text">
+                <h2>Who We Are</h2>
+                <p>We're a student team of cybersecurity majors building Cyber Guard as our graduation project. Our goal is a polished, practical tool that helps everyday users avoid phishing, malware, and unsafe websites.</p>
+              </div>
+            </div>
+          </div>
+          <div class="mission-item">
+            <div class="mission-item-content">
+              <div class="mission-icon-large"><span>⚙️</span></div>
+              <div class="mission-text">
+                <h2>What We Do</h2>
+                <p>Cyber Guard checks links in real time using reputation signals, URL patterns, and threat‑intel sources, then explains the risk in clear language with guidance on what to do next.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Technology Section -->
+    <section class="mission-section" style="padding-top: var(--spacing-xl); margin-bottom: var(--spacing-lg);">
+      <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: var(--spacing-2xl);">
+          <h2>Our Technology</h2>
+        </div>
+        <div class="mission-cards">
+          <div class="mission-card">
+            <div class="mission-icon">🌲</div>
+            <h2>Random Forest Algorithm</h2>
+            <p>Our core detection engine uses a Random Forest classifier trained on Kaggle datasets, analyzing multiple URL features including patterns, domain age, SSL certificates, and behavioral indicators to identify malicious websites with high accuracy.</p>
+          </div>
+          <div class="mission-card">
+            <div class="mission-icon">⚡</div>
+            <h2>Real-time Analysis</h2>
+            <p>Instant URL checking powered by Python backend processing that evaluates URLs against our trained model, providing immediate threat classification results for users before they click potentially dangerous links.</p>
+          </div>
+          <div class="mission-card">
+            <div class="mission-icon">🔌</div>
+            <h2>Browser Extension</h2>
+            <p>Lightweight browser extension built with JavaScript that seamlessly integrates with your browsing experience, providing real-time protection and automatic blocking of malicious URLs detected by our detection engine.</p>
+          </div>
+          <div class="mission-card">
+            <div class="mission-icon">🔍</div>
+            <h2>Multi-Feature Analysis</h2>
+            <p>Our model evaluates URL patterns, domain characteristics, content analysis, and behavioral patterns simultaneously, ensuring comprehensive threat detection across different attack vectors and phishing techniques.</p>
+          </div>
+          <div class="mission-card">
+            <div class="mission-icon">📊</div>
+            <h2>Historical Analysis</h2>
+            <p>Comprehensive logging system that stores classification results in CSV format, allowing users to review their browsing history and track patterns in detected threats over time through our web interface.</p>
+          </div>
+          <div class="mission-card">
+            <div class="mission-icon">💾</div>
+            <h2>Data Management</h2>
+            <p>Efficient data handling using CSV files for history storage and JSON for configuration, ensuring fast access times and seamless integration between our Python backend and JavaScript frontend components.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="team-section" style="padding-top: var(--spacing-xl);">
+      <div class="container">
+        <div class="section-header">
+          <h2>Meet Our Team</h2>
+          <p class="section-subtitle">We are cybersecurity major students, and this website is our graduation project.</p>
+        </div>
+        <div class="team-grid">
+          <article class="team-card">
+            <div class="member-avatar">👩‍💻</div>
+            <div class="member-info">
+              <h3>Kadi Almohanna</h3>
+              <p class="member-bio">Focused on practical threat detection and secure web development for our graduation project.</p>
+            </div>
+          </article>
+          <article class="team-card">
+            <div class="member-avatar">👩‍💻</div>
+            <div class="member-info">
+              <h3>Taif Alrashedi</h3>
+              <p class="member-bio">Works on research and analysis of malicious URLs and user‑centric protection features.</p>
+            </div>
+          </article>
+          <article class="team-card">
+            <div class="member-avatar">👩‍💻</div>
+            <div class="member-info">
+              <h3>Wajd Alessa</h3>
+              <p class="member-bio">Contributes to building detection logic and ensuring accessibility across devices.</p>
+            </div>
+          </article>
+          <article class="team-card">
+            <div class="member-avatar">👩‍💻</div>
+            <div class="member-info">
+              <h3>Shaden Alharbi</h3>
+              <p class="member-bio">Leads testing and quality to deliver reliable, user‑friendly protection tools.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer role="contentinfo">
+    <p>&copy; 2025 Cyber Guard. All rights reserved.</p>
+  </footer>
+
+  <!-- Scroll to Top Button -->
+  <button class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" aria-label="Back to top" title="Back to top">
+    ↑
+  </button>
+  
+  <script src="script.js"></script>
+  <script>
+    window.addEventListener('scroll', function() {
+      const backToTop = document.querySelector('.back-to-top');
+      if (backToTop && window.pageYOffset > 300) {
+        backToTop.classList.add('visible');
+      } else if (backToTop) {
+        backToTop.classList.remove('visible');
+      }
+    });
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="View your URL analysis history - See all the URLs you've scanned with Cyber Guard" />
+  <meta name="keywords" content="URL history, analysis history, scanned URLs, Cyber Guard history" />
+  <meta name="author" content="Cyber Guard Team" />
+  <title>Cyber Guard | History</title>
+  <link rel="stylesheet" href="style.css?v=21" />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <style>
+    html, body {
+      zoom: 1 !important;
+      transform: scale(1) !important;
+      -webkit-transform: scale(1) !important;
+      font-size: 16px !important;
+      -webkit-text-size-adjust: 100% !important;
+      text-size-adjust: 100% !important;
+    }
+    
+    .history-page {
+      padding: var(--spacing-3xl) var(--spacing-xl);
+      min-height: calc(100vh - 200px);
+    }
+    
+    .history-header {
+      margin-bottom: var(--spacing-2xl);
+      text-align: center;
+    }
+    
+    /* Ensure emojis render properly */
+    body {
+      font-family: var(--font-family-primary), "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
+    }
+    
+    .history-table-container {
+      background: var(--bg-primary);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+      overflow: hidden;
+      margin-top: var(--spacing-xl);
+      transition: var(--transition-all);
+    }
+    
+    .history-table-container:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      border-color: rgba(255, 255, 255, 0.3);
+      background: var(--bg-overlay);
+    }
+    
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .history-table thead {
+      background: transparent;
+      border-bottom: 2px solid rgba(138, 100, 214, 0.3);
+    }
+    
+    .history-table th {
+      padding: var(--spacing-xl) var(--spacing-lg);
+      text-align: center;
+      font-weight: 700;
+      color: #ffffff;
+      font-size: var(--font-size-xl);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 2px solid rgba(138, 100, 214, 0.5);
+      background: linear-gradient(135deg, rgba(138, 100, 214, 0.2), rgba(58, 202, 223, 0.2));
+      backdrop-filter: blur(10px);
+    }
+    
+    .history-table th {
+      -webkit-text-fill-color: #ffffff !important;
+      -webkit-background-clip: unset !important;
+      background-clip: unset !important;
+    }
+    
+    .history-table th * {
+      -webkit-text-fill-color: initial !important;
+      font-variant-emoji: emoji;
+    }
+    
+    .history-table tbody tr {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      transition: var(--transition-all);
+    }
+    
+    .history-table tbody tr:last-child {
+      border-bottom: none;
+    }
+    
+    /* Alternating row colors */
+    .history-table tbody tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    
+    .history-table tbody tr:nth-child(odd) {
+      background: transparent;
+    }
+    
+    .history-table tbody tr:hover {
+      background: var(--bg-secondary) !important;
+      transform: scale(1.01);
+    }
+    
+    .history-table tbody tr:focus-within {
+      outline: 2px solid rgba(138, 100, 214, 0.6);
+      outline-offset: -2px;
+    }
+    
+    .history-table td {
+      padding: var(--spacing-lg);
+      color: var(--text-primary);
+      text-align: center;
+    }
+    
+    .history-table td:first-child {
+      color: var(--text-secondary);
+      font-size: var(--font-size-sm);
+      white-space: nowrap;
+    }
+    
+    .history-table td:nth-child(2) {
+      word-break: break-all;
+    }
+    
+    .history-table td:nth-child(3) {
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+    
+    .history-header h1 {
+      font-size: var(--font-size-3xl);
+      margin: 0 0 var(--spacing-md) 0;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-sm);
+      color: #ffffff;
+      background: none !important;
+      -webkit-background-clip: unset !important;
+      -webkit-text-fill-color: #ffffff !important;
+      background-clip: unset !important;
+      font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
+      text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .history-url-link {
+      color: var(--link-color);
+      text-decoration: none;
+      transition: color var(--transition-duration) ease, text-decoration var(--transition-duration) ease;
+      word-break: break-word;
+    }
+
+    .history-url-link:hover,
+    .history-url-link:focus {
+      color: var(--link-hover-color);
+      text-decoration: underline;
+      outline: none;
+    }
+    
+    .history-loading {
+      text-align: center;
+      padding: var(--spacing-3xl);
+      color: var(--text-secondary);
+    }
+    
+    .history-error {
+      color: var(--color-error);
+      text-align: center;
+      padding: var(--spacing-lg);
+      -webkit-text-fill-color: var(--color-error) !important;
+      -webkit-background-clip: unset !important;
+      background-clip: unset !important;
+      background: none !important;
+    }
+    
+    .history-error * {
+      -webkit-text-fill-color: initial !important;
+      font-variant-emoji: emoji;
+    }
+    
+    .history-empty {
+      text-align: center;
+      padding: var(--spacing-3xl);
+      color: var(--text-secondary);
+    }
+    
+    /* Responsive table - stack on mobile */
+    @media (max-width: 768px) {
+      .history-table-container {
+        overflow-x: visible;
+      }
+      
+      .history-table,
+      .history-table thead,
+      .history-table tbody,
+      .history-table th,
+      .history-table td,
+      .history-table tr {
+        display: block;
+      }
+      
+      .history-table thead {
+        display: none;
+      }
+      
+      .history-table tr {
+        margin-bottom: var(--spacing-lg);
+        background: var(--bg-primary);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: var(--radius-md);
+        padding: var(--spacing-md);
+      }
+      
+      .history-table td {
+        padding: var(--spacing-sm) var(--spacing-md);
+        border: none;
+        position: relative;
+        padding-left: 50%;
+        text-align: left;
+      }
+      
+      .history-table td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: var(--spacing-md);
+        width: 45%;
+        font-weight: 600;
+        color: var(--text-secondary);
+      }
+      
+      .history-table td:first-child:before {
+        content: "🕒 Time:";
+      }
+      
+      .history-table td:nth-child(2):before {
+        content: "🔗 URL:";
+      }
+      
+      .history-table td:nth-child(3):before {
+        content: "🛡️ Classification:";
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Main Navigation -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <a href="index.html" class="logo" aria-label="Cyber Guard Home">
+      <div class="logo-icon" aria-hidden="true">
+        <img src="icon.png" alt="Cyber Guard Logo" loading="lazy" style="width: 100%; height: 100%; object-fit: contain;">
+      </div>
+      <span>Cyber Guard</span>
+    </a>
+    
+    <button class="mobile-menu-toggle" aria-label="Toggle mobile menu" onclick="toggleMobileMenu()" type="button">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    
+    <ul class="nav-menu" role="menubar" id="navMenu">
+      <li class="nav-menu__item" role="none">
+        <a href="index.html" class="nav-menu__link" role="menuitem">Home</a>
+      </li>
+      <li class="nav-menu__item" role="none">
+        <a href="history.html" class="nav-menu__link nav-menu__link--active" role="menuitem" aria-current="page">History</a>
+      </li>
+      <li class="nav-menu__item" role="none">
+        <a href="download.html" class="nav-menu__link" role="menuitem">Download</a>
+      </li>
+      <li class="nav-menu__item" role="none">
+        <a href="about.html" class="nav-menu__link" role="menuitem">About Us</a>
+      </li>
+    </ul>
+    
+    <div class="nav-actions">
+      <button 
+        class="btn--dark-mode dark-mode-toggle" 
+        onclick="toggleDarkMode()" 
+        aria-label="Toggle dark mode" 
+        title="Toggle Dark Mode"
+        type="button"
+      >
+        <svg class="moon-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="sun-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+      <button 
+        class="btn--login login-btn" 
+        id="loginBtn"
+        onclick="window.location.href='login.html'"
+        type="button"
+      >
+        Log in
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="history-page" role="main">
+    <div class="container">
+      <div class="history-header">
+        <h1>Blocked URLs Log</h1>
+      </div>
+
+      <div class="history-table-container">
+        <table class="history-table" id="HistoryTable">
+          <thead>
+            <tr>
+              <th>🕒 Time</th>
+              <th>🔗 URL</th>
+              <th>🛡️ Classification</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody">
+            <tr>
+              <td colspan="3" class="history-loading">
+                <div>Loading history...</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer role="contentinfo">
+    <p>&copy; 2025 Cyber Guard. All rights reserved.</p>
+  </footer>
+  
+  <script src="script.js"></script>
+  <script>
+    // Fetch history from backend API
+    fetch("http://localhost:5000/history")
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch history from backend');
+        }
+        return response.json();
+      })
+      .then(data => {
+        const tbody = document.querySelector("#HistoryTable tbody");
+        const history = data.history || [];
+        
+        if (history.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="3">
+                <div class="empty-state">
+                  <div class="empty-state-icon">📋</div>
+                  <div class="empty-state-title">No History Yet</div>
+                  <div class="empty-state-message">Your URL analysis history will appear here once you start scanning links or when the extension blocks malicious URLs.</div>
+                </div>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+        
+        tbody.innerHTML = '';
+        
+        history.forEach(item => {
+          const { timestamp, url, classification } = item;
+          
+          if (!timestamp || !url || !classification) return;
+          
+          // Format timestamp
+          let formattedTime = timestamp;
+          try {
+            const date = new Date(timestamp);
+            if (!isNaN(date.getTime())) {
+              formattedTime = date.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              });
+            }
+          } catch (e) {
+            // Keep original time if formatting fails
+          }
+          
+          const tr = document.createElement("tr");
+          const labelColor = classification.toLowerCase().includes('malicious') || 
+                           classification.toLowerCase().includes('phish') || 
+                           classification.toLowerCase().includes('unsafe') 
+                           ? '#f44336' : '#ff9800';
+          
+          tr.innerHTML = `
+            <td data-label="Time">${formattedTime}</td>
+            <td data-label="URL"><a href="${url}" target="_blank" rel="noopener noreferrer" class="history-url-link">${url}</a></td>
+            <td data-label="Classification" style="color: ${labelColor}">${classification}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(err => {
+        console.error('Error loading history:', err);
+        const tbody = document.querySelector("#HistoryTable tbody");
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="3">
+              <div class="empty-state">
+                <div class="empty-state-icon">⚠️</div>
+                <div class="empty-state-title">Failed to Load History</div>
+                <div class="empty-state-message">We couldn't connect to the backend server. Please make sure the backend is running on http://localhost:5000</div>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+    // Initialize dark mode
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof initializeDarkMode === 'function') {
+        initializeDarkMode();
+      }
+    });
+  </script>
+</body>
+</html>

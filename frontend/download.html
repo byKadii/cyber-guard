@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Download Cyber Guard browser extension for real-time URL threat detection and protection against malicious websites." />
+  <meta name="keywords" content="Cyber Guard download, browser extension, Chrome, Firefox, Edge, security plugin" />
+  <meta name="author" content="Cyber Guard Team" />
+  <title>Cyber Guard | Download Extension</title>
+  <link rel="stylesheet" href="style.css?v=21" />
+  <link rel="icon" type="image/png" href="icon.png" />
+</head>
+<body>
+  <!-- Main Navigation -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <a href="index.html" class="logo" aria-label="Cyber Guard Home">
+      <div class="logo-icon" aria-hidden="true">
+        <img src="icon.png" alt="Cyber Guard Logo" style="width: 100%; height: 100%; object-fit: contain;">
+      </div>
+      <span>Cyber Guard</span>
+    </a>
+    
+    <button class="mobile-menu-toggle" aria-label="Toggle mobile menu" onclick="toggleMobileMenu()" type="button">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    
+    <ul class="nav-menu" role="menubar" id="navMenu">
+      <li class="nav-menu__item" role="none">
+        <a href="index.html" class="nav-menu__link" role="menuitem">Home</a>
+      </li>
+      <li class="nav-menu__item" role="none">
+        <a href="history.html" class="nav-menu__link" role="menuitem">History</a>
+      </li>
+      <li class="nav-menu__item" role="none">
+        <a href="download.html" class="nav-menu__link nav-menu__link--active" role="menuitem" aria-current="page">Download</a>
+      </li>
+      <li class="nav-menu__item" role="none">
+        <a href="about.html" class="nav-menu__link" role="menuitem">About Us</a>
+      </li>
+    </ul>
+    
+    <div class="nav-actions">
+      <button 
+        class="btn--dark-mode dark-mode-toggle" 
+        onclick="toggleDarkMode()" 
+        aria-label="Toggle dark mode" 
+        title="Toggle Dark Mode"
+        type="button"
+      >
+        <svg class="moon-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="sun-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="5" fill="none" stroke="currentColor"/>
+          <line x1="12" y1="1" x2="12" y2="3" stroke="currentColor"/>
+          <line x1="12" y1="21" x2="12" y2="23" stroke="currentColor"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor"/>
+          <line x1="1" y1="12" x2="3" y2="12" stroke="currentColor"/>
+          <line x1="21" y1="12" x2="23" y2="12" stroke="currentColor"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor"/>
+        </svg>
+      </button>
+      <button 
+        class="btn--login login-btn" 
+        id="loginBtn"
+        onclick="window.location.href='login.html'"
+        type="button"
+      >
+        Log in
+      </button>
+    </div>
+  </nav>
+
+  <main class="download-page">
+    <!-- Installation Guide -->
+    <section class="installation-section">
+      <div class="container">
+        <h2 class="section-title">Simple Installation Process</h2>
+        <div class="steps-container steps-container--compact">
+          <div class="step-card step-card--compact">
+            <div class="step-number step-number--compact">1</div>
+            <div class="step-content">
+              <h3>Click Add to Chrome</h3>
+              <p>Visit the Chrome Web Store and click the "Add to Chrome" button</p>
+            </div>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step-card step-card--compact">
+            <div class="step-number step-number--compact">2</div>
+            <div class="step-content">
+              <h3>Confirm Installation</h3>
+              <p>Review permissions and confirm the installation in the popup dialog</p>
+            </div>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step-card step-card--compact">
+            <div class="step-number step-number--compact">3</div>
+            <div class="step-content">
+              <h3>Start Browsing Safely</h3>
+              <p>Extension is active! You're now protected from malicious websites</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Download Section -->
+    <section class="download-section">
+      <div class="container">
+        <div class="extension-card">
+          <div class="extension-header">
+            <div class="extension-icon">
+              <img src="icon.png" alt="Cyber Guard Extension Icon" loading="lazy" style="width: 100%; height: 100%; object-fit: contain;">
+            </div>
+            <div class="extension-info">
+              <h2>Cyber Guard Extension</h2>
+            </div>
+          </div>
+          <div class="extension-features">
+            <div class="feature-tag">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M5 13l4 4L19 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Real-time URL scanning
+            </div>
+            <div class="feature-tag">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M5 13l4 4L19 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Machine learning powered
+            </div>
+            <div class="feature-tag">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M5 13l4 4L19 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Zero data collection
+            </div>
+          </div>
+          <div class="extension-actions">
+            <button class="btn-download-primary" onclick="window.open('https://chrome.google.com/webstore', '_blank')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <polyline points="7 10 12 15 17 10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <line x1="12" y1="15" x2="12" y2="3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Add to Chrome
+            </button>
+            <p class="download-note">Free • No credit card required</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer role="contentinfo">
+    <p>&copy; 2025 Cyber Guard. All rights reserved.</p>
+  </footer>
+  
+  <script src="script.js"></script>
+</body>
+</html>
