@@ -1,3 +1,6 @@
+const API_BASE_URL = "http://localhost:5000";
+
+// Listen for tab updates and check URLs if auto-check is enabled
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (
     changeInfo.status === "complete" &&
@@ -5,76 +8,59 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     !tab.url.startsWith("chrome://") &&
     !tab.url.startsWith("chrome-extension://")
   ) {
-    // Check if auto-check is enabled
-    chrome.storage.local.get("autoCheck", (data) => {
-      // Only proceed if autoCheck is enabled
-      if (data.autoCheck === true) {
-        fetch("http://127.0.0.1:5000/predict", {
+    // Check if auto-check is enabled and user is authenticated
+    chrome.storage.local.get(["autoCheck", "jwtToken"], (data) => {
+      // Only proceed if autoCheck is enabled AND user has JWT token
+      if (data.autoCheck === true && data.jwtToken) {
+        fetch(`${API_BASE_URL}/predict`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${data.jwtToken}`
+          },
           body: JSON.stringify({ url: tab.url })
         })
         .then(response => response.json())
-        .then(data => {
-          const rawPrediction = (data.prediction || "").toLowerCase();
+        .then(result => {
+          const prediction = (result.prediction || "").toLowerCase();
+          const threatLevel = result.threat_level || "medium";
 
-          // ✅ تصنيف واضح: إما ضار أو آمن فقط
-          const prediction = ["malicious", "phishing", "unsafe"].includes(rawPrediction)
-            ? "malicious"
-            : "benign";
+          // Categorize as safe or malicious
+          const isAlarmingViaURL = ["malicious", "phishing", "unsafe"].includes(prediction);
 
-          // ✅ نوتيفيكيشن النظام الرسائل 
+          // Show notification
           chrome.notifications.create({
             type: "basic",
             iconUrl: "icon.png",
-            title: prediction === "benign" ? "Safe Site ✅" : "Unsafe Site ⚠️",
-            message: prediction === "benign"
-              ? "This site is considered safe."
-              : "Warning: This site has been blocked for your safety.",
-            priority: 2
+            title: isAlarmingViaURL ? "⚠️ Malicious Site Detected" : "✅ Safe Site",
+            message: isAlarmingViaURL
+              ? `Threat Level: ${threatLevel}. This site has been flagged as potentially dangerous.`
+              : "This site appears to be safe.",
+            priority: isAlarmingViaURL ? 2 : 0
           });
 
-          // ✅ إذا الموقع ضار → نافذة تحذير + إغلاق التبويب
-          if (prediction === "malicious") {
+          // If malicious: show warning page and optionally close tab
+          if (isAlarmingViaURL) {
             chrome.windows.create({
-              url: chrome.runtime.getURL("warning.html") + "?url=" + encodeURIComponent(tab.url),
+              url: chrome.runtime.getURL("warning.html") + 
+                   "?url=" + encodeURIComponent(tab.url) + 
+                   "&threat=" + encodeURIComponent(prediction) +
+                   "&level=" + encodeURIComponent(threatLevel),
               type: "popup",
-              width: 400,
-              height: 300
+              width: 500,
+              height: 400
             });
 
-            chrome.tabs.remove(tabId);
-            return;
+            // Close the malicious tab after showing warning
+            setTimeout(() => {
+              chrome.tabs.remove(tabId);
+            }, 1000);
           }
-          // ✅ إذا الموقع آمن → بوب أب داخل الصفحة بنفس الرسالة السابقة
-          chrome.scripting.executeScript({
-            target: { tabId: tabId },
-            func: () => {
-              const div = document.createElement("div");
-              div.textContent = "✅ This site is considered safe";
-              div.style.position = "fixed";
-              div.style.top = "20px";
-              div.style.right = "20px";
-              div.style.width = "300px";
-              div.style.height = "100px";
-              div.style.background = "#d4edda";
-              div.style.color = "#000";
-              div.style.display = "flex";
-              div.style.alignItems = "center";
-              div.style.justifyContent = "center";
-              div.style.fontSize = "20px";
-              div.style.fontWeight = "bold";
-              div.style.border = "2px solid #ccc";
-              div.style.borderRadius = "12px";
-              div.style.zIndex = "9999";
-              div.style.boxShadow = "0 0 10px rgba(0,0,0,0.2)";
-              document.body.appendChild(div);
-
-              setTimeout(() => div.remove(), 5000);
-            }
-          });
         })
-        .catch(error => console.error("Prediction error:", error));
+        .catch(error => {
+          console.error("Error checking URL:", error);
+          // Don't block if backend is unavailable
+        });
       }
     });
   }

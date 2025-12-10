@@ -862,6 +862,13 @@ function saveUserAuth(token, userData) {
   try {
     localStorage.setItem(AUTH_CONFIG.tokenKey, token);
     localStorage.setItem(AUTH_CONFIG.storageKey, JSON.stringify(userData));
+    
+    // Also save JWT token to Chrome extension storage so extension can use it
+    if (typeof chrome !== 'undefined' && chrome.storage) {
+      chrome.storage.local.set({ jwtToken: token }, () => {
+        console.log('JWT token saved to extension storage');
+      });
+    }
   } catch (e) {
     console.error('Failed to save auth data:', e);
   }
@@ -901,6 +908,13 @@ function clearUserAuth() {
   try {
     localStorage.removeItem(AUTH_CONFIG.tokenKey);
     localStorage.removeItem(AUTH_CONFIG.storageKey);
+    
+    // Also clear JWT token from extension storage
+    if (typeof chrome !== 'undefined' && chrome.storage) {
+      chrome.storage.local.remove('jwtToken', () => {
+        console.log('JWT token cleared from extension storage');
+      });
+    }
   } catch (e) {
     console.error('Failed to clear auth data:', e);
   }
