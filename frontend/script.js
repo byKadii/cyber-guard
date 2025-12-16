@@ -210,6 +210,10 @@ function completeAnalysis(url, startTime, analysisResult = null) {
     
     displayAnalysisResults(analysisResult, analysisDuration);
     saveAnalysisToHistory(url, analysisResult);
+    // Save to backend history as well
+    const status = analysisResult.isSafe ? 'safe' : 'dangerous';
+    const threatLevel = analysisResult.isSafe ? 'low' : 'high';
+    addToUserHistory(url, status, threatLevel);
     incrementUrlAnalysisCounter();
   }, ANALYSIS_CONFIG.resultDelay);
 }
@@ -607,7 +611,10 @@ const FORM_CONFIG = {
  * Uses relative endpoints so the site can work against different hosts.
  */
 async function apiFetch(endpoint, options = {}) {
-  const url = endpoint.startsWith('http') ? endpoint : `${window.location.origin}${endpoint}`;
+  const origin = (window.location && window.location.origin && window.location.origin !== 'null' && !window.location.origin.startsWith('file://'))
+    ? window.location.origin
+    : 'http://localhost:8000';
+  const url = endpoint.startsWith('http') ? endpoint : `${origin}${endpoint}`;
   return fetch(url, options);
 }
 
@@ -857,28 +864,80 @@ function isValidSignupData(formData) {
   return Boolean(formData.username && formData.email && formData.password);
 }
 
-// Authentication helper functions removed; session restoration is a no-op
-function updateUIForLoggedIn(userData) {
+// Authentication helper functions
+function updateUIForLoggedIn(username) {
   const loginBtn = document.getElementById('loginBtn');
   if (loginBtn) {
-    loginBtn.textContent = 'Account';
-    loginBtn.href = '#';
-    loginBtn.onclick = () => showNotification('Accounts removed', 'info');
+    loginBtn.textContent = username;
+    loginBtn.onclick = handleLogout;
   }
+  // Also update any other login buttons on the page
+  document.querySelectorAll('.login-btn').forEach(btn => {
+    if (btn.id !== 'loginBtn') {
+      btn.textContent = username;
+      btn.onclick = handleLogout;
+    }
+  });
 }
 
 function updateUIForLoggedOut() {
   const loginBtn = document.getElementById('loginBtn');
   if (loginBtn) {
     loginBtn.textContent = 'Log in';
-    loginBtn.href = '#';
-    loginBtn.onclick = () => showNotification('Login removed', 'info');
+    loginBtn.onclick = () => window.location.href = 'login.html';
+  }
+  // Also update any other login buttons on the page
+  document.querySelectorAll('.login-btn').forEach(btn => {
+    if (btn.id !== 'loginBtn') {
+      btn.textContent = 'Log in';
+      btn.onclick = () => window.location.href = 'login.html';
+    }
+  });
+}
+
+function restoreUserSession() {
+  // Check if user is logged in via localStorage
+  const loggedInUser = localStorage.getItem('cyberGuardUser');
+  if (loggedInUser) {
+    updateUIForLoggedIn(loggedInUser);
+  } else {
+    updateUIForLoggedOut();
   }
 }
 
-async function restoreUserSession() {
-  // No server-side authentication present; ensure UI shows logged out state
+/**
+ * Handle login form submission
+ */
+function handleLogin(event) {
+  event.preventDefault();
+  
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  
+  if (!username || !password) {
+    showNotification('Please enter username and password', 'error');
+    return;
+  }
+  
+  // Store user in localStorage (simple client-side auth)
+  localStorage.setItem('cyberGuardUser', username);
+  
+  showNotification('Login successful! Welcome, ' + username, 'success');
+  
+  // Redirect to home page after short delay
+  setTimeout(() => {
+    window.location.href = 'index.html';
+  }, 1000);
+}
+
+/**
+ * Handle logout
+ */
+function handleLogout() {
+  localStorage.removeItem('cyberGuardUser');
+  showNotification('You have been logged out', 'info');
   updateUIForLoggedOut();
+  window.location.href = 'index.html';
 }
 
 /**
@@ -914,16 +973,65 @@ async function initHistoryPage() {
   const history = await fetchUserHistory();
 
   if (!history || history.length === 0) {
-    tbody.innerHTML = `\n      <tr>\n        <td colspan="3">\n          <div class="empty-state">\n            <div class="empty-state-icon">📋</div>\n            <div class="empty-state-title">No History Yet</div>\n            <div class="empty-state-message">Your URL analysis history will appear here once you start scanning links or when the extension blocks malicious URLs.</div>\n          </div>\n        </td>\n      </tr>\n    `;
+    tbody.innerHTML = `\n      <tr>\n        <td colspan="3">\n          <div class="empty-state">\n            <div class="empty-state-icon">📋</div>\n            <div class="empty-state-title">No History Yet</div>\n          </div>\n        </td>\n      </tr>\n    `;
     return;
   }
 
   // Render rows
   tbody.innerHTML = history.map(item => {
-    const time = item.timestamp || '';
-    const url = escapeHtml(item.url || '');
+    const timestamp = item.timestamp || '';
+    // Format timestamp to human-readable date and time
+    let formattedTime = '';
+    if (timestamp) {
+      try {
+        // Parse timestamp - handle both SQLite format and ISO format
+        let date;
+        if (timestamp.includes('T')) {
+          // ISO format with timezone
+          date = new Date(timestamp);
+        } else {
+          // SQLite format (YYYY-MM-DD HH:MM:SS) - treat as UTC
+          date = new Date(timestamp + 'Z');
+        }
+        
+        // Verify the date is valid
+        if (isNaN(date.getTime())) {
+          formattedTime = timestamp;
+        } else {
+          // Format as: MM/DD/YYYY, HH:MM:SS AM/PM in user's local timezone
+          formattedTime = date.toLocaleString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+          });
+        }
+      } catch (e) {
+        formattedTime = timestamp; // Fallback to raw timestamp if parsing fails
+      }
+    }
+    
+    const url = item.url || '';
+    const urlDisplay = escapeHtml(url);
     const status = escapeHtml(item.status || '');
-    return `\n      <tr>\n        <td>${time}</td>\n        <td><a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a></td>\n        <td>${status}</td>\n      </tr>\n    `;
+    const statusLower = status.toLowerCase();
+    
+    // Determine CSS class based on classification
+    let statusClass = 'status-unknown';
+    if (statusLower === 'benign' || statusLower === 'safe') {
+      statusClass = 'status-safe';
+    } else if (statusLower === 'phishing') {
+      statusClass = 'status-phishing';
+    } else if (statusLower === 'malicious') {
+      statusClass = 'status-malicious';
+    } else if (statusLower === 'defacement') {
+      statusClass = 'status-defacement';
+    }
+    
+    return `\n      <tr>\n        <td>${formattedTime}</td>\n        <td><a href="${url}" target="_blank" rel="noopener noreferrer">${urlDisplay}</a></td>\n        <td><span class="classification-badge ${statusClass}">${status}</span></td>\n      </tr>\n    `;
   }).join('');
 }
 
@@ -949,6 +1057,30 @@ async function addToUserHistory(url, status, threatLevel) {
     });
   } catch (error) {
     console.error('Failed to add to history:', error);
+  }
+}
+
+/**
+ * Clear all history from backend
+ */
+async function clearAllHistory() {
+  if (!confirm('Are you sure you want to clear all history?')) {
+    return;
+  }
+  try {
+    const response = await apiFetch('/api/history/clear', { method: 'DELETE' });
+    if (response && response.ok) {
+      showNotification('All history cleared', 'success');
+      // Refresh the history page
+      if (typeof initHistoryPage === 'function') {
+        initHistoryPage();
+      }
+    } else {
+      showNotification('Failed to clear history', 'error');
+    }
+  } catch (error) {
+    console.error('Failed to clear history:', error);
+    showNotification('Failed to clear history', 'error');
   }
 }
 
@@ -1056,12 +1188,12 @@ function removeLeftoverAuthElements() {
   if (loginBtn) loginBtn.remove();
 }
 
-// Run cleanup as soon as DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', removeLeftoverAuthElements);
-} else {
-  removeLeftoverAuthElements();
-}
+// Auth cleanup disabled - login button should remain visible
+// if (document.readyState === 'loading') {
+//   document.addEventListener('DOMContentLoaded', removeLeftoverAuthElements);
+// } else {
+//   removeLeftoverAuthElements();
+// }
 
 /**
  * Initializes dark mode based on saved preference

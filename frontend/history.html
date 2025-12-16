@@ -135,9 +135,58 @@
       text-transform: capitalize;
     }
     
+    /* Classification badge styles */
+    .classification-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: var(--font-size-sm);
+      text-transform: capitalize;
+    }
+    
+    .status-safe {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.1));
+      color: #22c55e;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+    
+    .status-phishing {
+      background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(249, 115, 22, 0.1));
+      color: #f97316;
+      border: 1px solid rgba(249, 115, 22, 0.3);
+    }
+    
+    .status-malicious {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1));
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    
+    .status-defacement {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.1));
+      color: #a855f7;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+    }
+    
+    .status-unknown {
+      background: linear-gradient(135deg, rgba(156, 163, 175, 0.2), rgba(156, 163, 175, 0.1));
+      color: #9ca3af;
+      border: 1px solid rgba(156, 163, 175, 0.3);
+    }
+    
+    .history-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-xl);
+    }
+    
     .history-header h1 {
       font-size: var(--font-size-3xl);
-      margin: 0 0 var(--spacing-md) 0;
+      margin: 0;
       font-weight: 700;
       display: flex;
       align-items: center;
@@ -150,6 +199,31 @@
       background-clip: unset !important;
       font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
       text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .clear-history-btn {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+      padding: var(--spacing-sm) var(--spacing-lg);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      transition: var(--transition-all);
+    }
+    
+    .clear-history-btn:hover {
+      background: rgba(239, 68, 68, 0.25);
+      border-color: rgba(239, 68, 68, 0.5);
+      transform: translateY(-1px);
+    }
+    
+    .clear-history-btn svg {
+      flex-shrink: 0;
     }
     
     .history-url-link {
@@ -191,6 +265,34 @@
       text-align: center;
       padding: var(--spacing-3xl);
       color: var(--text-secondary);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: var(--spacing-3xl);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: var(--spacing-lg);
+    }
+    
+    .empty-state-title {
+      font-size: var(--font-size-xl);
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: var(--spacing-md);
+    }
+    
+    .empty-state-message {
+      color: var(--text-secondary);
+      max-width: 500px;
+      text-align: center;
+      line-height: 1.6;
     }
     
     /* Responsive table - stack on mobile */
@@ -305,6 +407,14 @@
           <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
         </svg>
       </button>
+      <button 
+        class="btn--login login-btn" 
+        onclick="window.location.href='login.html'"
+        type="button"
+        id="loginBtn"
+      >
+        Log in
+      </button>
     </div>
   </nav>
 
@@ -312,7 +422,21 @@
   <main class="history-page" role="main">
     <div class="container">
       <div class="history-header">
-        <h1>Blocked URLs Log</h1>
+        <h1>URL Block History</h1>
+        <button 
+          class="btn--action clear-history-btn" 
+          onclick="clearAllHistory()" 
+          title="Clear All History"
+          type="button"
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+          </svg>
+          Clear History
+        </button>
       </div>
 
       <div class="history-table-container">

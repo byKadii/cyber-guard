@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Log in to your Cyber Guard account to access advanced URL threat detection features and manage your security settings." />
-  <meta name="keywords" content="Cyber Guard login, account access, user authentication, security dashboard" />
+  <meta name="description" content="Create a new Cyber Guard account to access advanced URL threat detection features and personalized security settings." />
+  <meta name="keywords" content="Cyber Guard signup, create account, user registration, security dashboard" />
   <meta name="author" content="Cyber Guard Team" />
-  <title>Cyber Guard | User Login</title>
-  <link rel="stylesheet" href="style.css?v=21" />
+  <title>Cyber Guard | Create Account</title>
+  <link rel="stylesheet" href="style.css?v=20" />
   <link rel="icon" type="image/png" href="icon.png" />
 </head>
 <body>
@@ -67,7 +67,6 @@
         class="btn--login login-btn" 
         onclick="window.location.href='login.html'"
         type="button"
-        id="loginBtn"
       >
         Log in
       </button>
@@ -75,9 +74,9 @@
   </nav>
 
   <main class="login">
-    <h1>Log in to your account</h1>
+    <h1>Create a new account</h1>
 
-    <form class="input-box" onsubmit="handleLogin(event)" role="form" aria-label="Login form">
+    <form class="input-box" onsubmit="handleSignup(event)" role="form" aria-label="Signup form">
       <div class="form-group">
         <label for="username" class="sr-only">Username</label>
         <input 
@@ -92,6 +91,19 @@
       </div>
       
       <div class="form-group">
+        <label for="email" class="sr-only">Email</label>
+        <input 
+          type="email" 
+          id="email"
+          name="email"
+          class="form-input"
+          placeholder="Email" 
+          required 
+          autocomplete="email"
+        />
+      </div>
+      
+      <div class="form-group">
         <label for="password" class="sr-only">Password</label>
         <input 
           type="password" 
@@ -100,15 +112,15 @@
           class="form-input"
           placeholder="Password" 
           required 
-          autocomplete="current-password"
+          autocomplete="new-password"
         />
       </div>
       
-      <button type="submit" class="primary-btn">Log In</button>
+      <button type="submit" class="primary-btn">Sign Up</button>
     </form>
 
     <p class="small-text">
-      Don't have an account? <a href="signup.html">Sign Up</a>
+      Already have an account? <a href="login.html">Log in</a>
     </p>
   </main>
 
